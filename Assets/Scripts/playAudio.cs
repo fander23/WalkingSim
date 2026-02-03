@@ -25,21 +25,41 @@ private void OnTriggerEnter(Collider other)
     {
         if(other.tag == "Player")
         {
-            audio.Pause();
+            StopAllCoroutines();
+            StartCoroutine(FadeAudioOut(true));
         }
     }
 
     private IEnumerator FadeAudio(bool fadeIn)
     {
         float timer = 0;
+        float start = fadeIn ? 0 : audio.volume;
+        float end = fadeIn ? 1 : 0;
+
+        if(fadeIn ) audio.Play();
         while(timer < fadeTimeInSeconds)
         {
-            audio.volume = Mathf.Lerp(0, 1, timer / fadeTimeInSeconds);
+            audio.volume = Mathf.Lerp(start, end, timer / fadeTimeInSeconds);
             timer += Time.deltaTime;
             yield return null;
         }
 
-        audio.volume = 1;
+        audio.volume = end;
+        if (fadeIn) audio.Pause();
+    }
+
+    private IEnumerator FadeAudioOut(bool fadeOut)
+    {
+        float timer = 0;
+        while(timer < fadeTimeInSeconds)
+        {
+            audio.volume = Mathf.Lerp(1, 0, timer / fadeTimeInSeconds);
+            timer += Time.deltaTime;
+            yield return null;
+        }
+
+        audio.volume = 0;
+        audio.Pause();
     }
 
 }
